@@ -53,6 +53,15 @@ One of the composition methods could be message redirection. The most simplistic
 
 Most simplistic write-once channel. It automatically closes (`CanSend = false`) when value has been written to it. Useful for on-demand channels used in single request/response mechanics. Thanks to those properties they should be fairly lightweight and fast.
 
+### Leased channel
+
+It's variation on write-once channel. Motivation here is to have a WO channel semantics that could be used potentially for lightweight actors request-response mechanism. For that every channel needs to be registered somewhere in the actor host - this action may however carry considerable cost. Therefore we could use a poll of preallocated channels and lease them on demand.
+
+Leased channels can be obtained from pool, but require two things to provide:
+
+- **CorrelationID** used to correlate current lease with possible value that will come to that channel. Once the lease is out, messages with that correlation id will no longer be valid.
+- **Timeout** after which the lease will be released. This is to block option of lease-forever cases, which could saturate the whole pool. After timeout has passed, message with current correlation id won't be valid and Receive task will cause a timeout exception. 
+
 ### Single consumer channel
 
 Channel optimized for single consumer - especially usefull in actor scenarios.
