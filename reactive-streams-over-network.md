@@ -18,13 +18,4 @@ We know that we are able to provide guaranteed order delivery between two endpoi
 
 ### Batching messages over network
 
-Other nice property of variable demand is that since we know the demand, we are able to send a batch of messages at once if only consumer is able to provide them.
-
-This batch message could look like:
-
-```fsharp
-type Batch<T> = {
-    ControlNr: long     // ctrl number of the first element in batch
-    Events: Event<T>[]  // collection of events send from the producer
-}
-```
+Other nice property of variable demand is that since we know the demand, we are able to send a batch of messages at once if only consumer is able to provide them. This can be easily achieved via `Conflate` stage - it would be probably a good idea to extend conflate with windowing (so when new demand arrives, we don't send a whole conflated batch in one go, but cut it into pieces and send them instead).
